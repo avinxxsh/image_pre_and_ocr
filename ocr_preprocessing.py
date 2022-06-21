@@ -3,7 +3,7 @@ import pytesseract
 import numpy as np
 
 # opening image file and loading it onto memory
-image_file = "sample7.png"
+image_file = "sample8.jpg"
 img = cv.imread(image_file)
 
 # opening loaded image in new window with a window name
@@ -25,9 +25,9 @@ for plane in rgb_planes:
 result = cv.merge(result_planes)
 result_norm = cv.merge(result_norm_planes)
 
-cv.imwrite('temp/shadows_out.png', result)
+cv.imwrite("temp/shadows_out.png", result)
 cv.imshow("Shadow Removed - Non Normalized", result)
-cv.imwrite('temp/shadows_out_norm.png', result_norm)
+cv.imwrite("temp/shadows_out_norm.png", result_norm)
 cv.imshow("Shadow Removed -  Normalized", result_norm)
 
 
@@ -46,7 +46,6 @@ cv.waitKey(0)
 # cv.imshow("Resized Image", resized_img)
 
 
-
 # binarization
 # first step will be to convert to greyscale
 def grayscale(image):
@@ -59,8 +58,8 @@ cv.imwrite("temp/grey.jpeg", gray_image)
 cv.waitKey(0)
 
 # converting image to grayscale is only the 1st step of binarization - makes the process easier
-# thresh, im_bw = cv.threshold(gray_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C + cv.THRESH_BINARY, 11 ,2)
-thresh, im_bw = cv.threshold(gray_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+thresh, im_bw = cv.threshold(gray_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C + cv.THRESH_BINARY, 11 ,2)
+# thresh, im_bw = cv.threshold(gray_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 # the integers entered are pixel values where 0 is black, 127 is the mid-tone point and 255 is white
 cv.imwrite("temp/bw_image.jpeg", im_bw)
 cv.imshow("B/W Image", im_bw)
@@ -119,7 +118,6 @@ def thick_font(image):
     image = cv.dilate(image, kernel, iterations=1)
     image = cv.bitwise_not(image)
     return image
-
 
 
 # dilated_img = thick_font(no_noise)
@@ -192,13 +190,26 @@ print(pytesseract.image_to_string(img_1))
 # print(pytesseract.image_to_boxes(img_1))
 
 # showing character detection
+# hImg, wImg = img_1.shape[0:2]
+# boxes = pytesseract.image_to_boxes(no_noise)
+# for b in boxes.splitlines():
+#     b = b.split(' ')
+#     # print(b)
+#     x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
+#     cv.rectangle(img_1, (x, hImg - y), (w, hImg - h), (0, 0, 255), 2)
+
+# detecting words
 hImg, wImg = img_1.shape[0:2]
-boxes = pytesseract.image_to_boxes(no_noise)
-for b in boxes.splitlines():
-    b = b.split(' ')
-    # print(b)
-    x, y, w, h = int(b[1]), int(b[2]), int(b[3]), int(b[4])
-    cv.rectangle(img_1, (x, hImg - y), (w, hImg - h), (0, 0, 255), 2)
+boxes = pytesseract.image_to_data(no_noise)
+for x, b in enumerate(boxes.splitlines()):
+    if x != 0:
+        b = b.split()
+        print(b)
+        if len(b) == 12:
+            x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+            cv.rectangle(img_1, (x, y), (w + x, h + y), (0, 0, 225), 3)
+            cv.putText(img_1, b[11], (x, y), cv.FONT_HERSHEY_PLAIN, 1, (50, 50, 255), 2)
+
 
 cv.imshow("Final Image", img_1)
 cv.waitKey(0)

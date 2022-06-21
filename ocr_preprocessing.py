@@ -16,6 +16,13 @@ cv.imwrite("temp/inverted.jpeg", inverted_image)
 cv.waitKey(0)
 
 # rescaling image
+# option-1
+# resized_img = cv.resize(img, (0,0), fx=0.5, fy=0.5)
+# option-2
+resized_img = cv.resize(img, (400, 400))
+cv.imwrite("temp/resized_img.jpg", resized_img)
+cv.imshow("Resized Image", resized_img)
+
 
 
 # binarization
@@ -91,11 +98,12 @@ def thick_font(image):
     image = cv.bitwise_not(image)
     return image
 
-#
-dilated_img = thick_font(no_noise)
-cv.imwrite("temp/dilated_img.jpg", dilated_img)
-cv.imshow("Dilated Image", dilated_img)
-cv.waitKey(0)
+
+
+# dilated_img = thick_font(no_noise)
+# cv.imwrite("temp/dilated_img.jpg", dilated_img)
+# cv.imshow("Dilated Image", dilated_img)
+# cv.waitKey(0)
 #
 #
 # # handling rotation and skewed documents

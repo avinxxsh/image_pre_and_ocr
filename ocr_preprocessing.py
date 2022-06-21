@@ -1,16 +1,38 @@
 import cv2 as cv
 import pytesseract
+import numpy as np
 
 # opening image file and loading it onto memory
-image_file = "sample3.jpg"
+image_file = "sample7.png"
 img = cv.imread(image_file)
 
 # opening loaded image in new window with a window name
 cv.imshow("Original Image", img)
 cv.waitKey(0)
 
+# removing shadows from image
+rgb_planes = cv.split(img)
+result_planes = []
+result_norm_planes = []
+for plane in rgb_planes:
+    dilated_img = cv.dilate(plane, np.ones((7,7), np.uint8))
+    bg_img = cv.medianBlur(dilated_img, 21)
+    diff_img = 255 - cv.absdiff(plane, bg_img)
+    norm_img = cv.normalize(diff_img, None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX, dtype=cv.CV_8UC1)
+    result_planes.append(diff_img)
+    result_norm_planes.append(norm_img)
+
+result = cv.merge(result_planes)
+result_norm = cv.merge(result_norm_planes)
+
+cv.imwrite('temp/shadows_out.png', result)
+cv.imshow("Shadow Removed - Non Normalized", result)
+cv.imwrite('temp/shadows_out_norm.png', result_norm)
+cv.imshow("Shadow Removed -  Normalized", result_norm)
+
+
 # inverting image - most effective with tesseract v3
-inverted_image = cv.bitwise_not(img)
+inverted_image = cv.bitwise_not(result_norm)
 cv.imwrite("temp/inverted.jpeg", inverted_image)
 # cv.imshow("Inverted Image", inverted_image)
 cv.waitKey(0)
@@ -19,9 +41,9 @@ cv.waitKey(0)
 # option-1
 # resized_img = cv.resize(img, (0,0), fx=0.5, fy=0.5)
 # option-2
-resized_img = cv.resize(img, (400, 400))
-cv.imwrite("temp/resized_img.jpg", resized_img)
-cv.imshow("Resized Image", resized_img)
+# resized_img = cv.resize(img, (400, 400))
+# cv.imwrite("temp/resized_img.jpg", resized_img)
+# cv.imshow("Resized Image", resized_img)
 
 
 
@@ -31,14 +53,14 @@ def grayscale(image):
     return cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
 
-gray_image = grayscale(img)
+gray_image = grayscale(result_norm)
 cv.imwrite("temp/grey.jpeg", gray_image)
 # cv.imshow("Gray Image", gray_image)
 cv.waitKey(0)
 
 # converting image to grayscale is only the 1st step of binarization - makes the process easier
-thresh, im_bw = cv.threshold(gray_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C + cv.THRESH_BINARY, 11 ,2)
-# thresh, im_bw = cv.threshold(gray_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+# thresh, im_bw = cv.threshold(gray_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C + cv.THRESH_BINARY, 11 ,2)
+thresh, im_bw = cv.threshold(gray_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 # the integers entered are pixel values where 0 is black, 127 is the mid-tone point and 255 is white
 cv.imwrite("temp/bw_image.jpeg", im_bw)
 cv.imshow("B/W Image", im_bw)
@@ -165,13 +187,13 @@ def thick_font(image):
 
 
 pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-img_1 = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+img_1 = cv.cvtColor(no_noise, cv.COLOR_BGR2RGB)
 print(pytesseract.image_to_string(img_1))
 # print(pytesseract.image_to_boxes(img_1))
 
 # showing character detection
 hImg, wImg = img_1.shape[0:2]
-boxes = pytesseract.image_to_boxes(img)
+boxes = pytesseract.image_to_boxes(no_noise)
 for b in boxes.splitlines():
     b = b.split(' ')
     # print(b)

@@ -7,7 +7,7 @@ image_file = "sample8.jpg"
 img = cv.imread(image_file)
 
 # opening loaded image in new window with a window name
-cv.imshow("Original Image", img)
+# cv.imshow("Original Image", img)
 cv.waitKey(0)
 
 # removing shadows from image
@@ -26,9 +26,9 @@ result = cv.merge(result_planes)
 result_norm = cv.merge(result_norm_planes)
 
 cv.imwrite("temp/shadows_out.png", result)
-cv.imshow("Shadow Removed - Non Normalized", result)
+# cv.imshow("Shadow Removed - Non Normalized", result)
 cv.imwrite("temp/shadows_out_norm.png", result_norm)
-cv.imshow("Shadow Removed -  Normalized", result_norm)
+# cv.imshow("Shadow Removed -  Normalized", result_norm)
 
 
 # inverting image - most effective with tesseract v3
@@ -62,7 +62,7 @@ thresh, im_bw = cv.threshold(gray_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C + cv
 # thresh, im_bw = cv.threshold(gray_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 # the integers entered are pixel values where 0 is black, 127 is the mid-tone point and 255 is white
 cv.imwrite("temp/bw_image.jpeg", im_bw)
-cv.imshow("B/W Image", im_bw)
+# cv.imshow("B/W Image", im_bw)
 cv.waitKey(0)
 
 
@@ -81,7 +81,7 @@ def noise_removal(image):
 
 no_noise = noise_removal(im_bw)
 cv.imwrite("temp/no_noise.jpeg", no_noise)
-cv.imshow("Noise Removed", no_noise)
+# cv.imshow("Noise Removed", no_noise)
 cv.waitKey(0)
 
 
@@ -92,7 +92,7 @@ cv.waitKey(0)
 # blurred_dilation = cv2.GaussianBlur(dilation, (13, 13), 0)
 # resized = cv2.resize(blurred_dilation, (w, h))
 # corrected = img / resized * 255
-
+#
 # # working with thick and thin fonts
 # # making font thinner
 # def thin_font(image):
@@ -111,75 +111,75 @@ cv.waitKey(0)
 #
 #
 # making font thicker
-def thick_font(image):
-    import numpy as np
-    image = cv.bitwise_not(image)
-    kernel = np.ones((2, 1), np.uint8)
-    image = cv.dilate(image, kernel, iterations=1)
-    image = cv.bitwise_not(image)
-    return image
-
-
+# def thick_font(image):
+#     import numpy as np
+#     image = cv.bitwise_not(image)
+#     kernel = np.ones((2, 2), np.uint8)
+#     image = cv.dilate(image, kernel, iterations=1)
+#     image = cv.bitwise_not(image)
+#     return image
+#
+#
 # dilated_img = thick_font(no_noise)
 # cv.imwrite("temp/dilated_img.jpg", dilated_img)
 # cv.imshow("Dilated Image", dilated_img)
 # cv.waitKey(0)
 #
 #
-# # handling rotation and skewed documents
-# # the code below will not be effective if image has borders, borders have to be removed first
-# skewed_img = cv.imread("skewed1.jpg")
-#
-#
-# def getSkewAngle(cvImage) -> float:
-#     # Prep image, copy, convert to gray scale, blur, and threshold
-#     newImage = cvImage.copy()
-#     gray = cv.cvtColor(newImage, cv.COLOR_BGR2GRAY)
-#     blur = cv.GaussianBlur(gray, (9, 9), 0)
-#     thresh = cv.threshold(blur, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
-#
-#     # Apply dilate to merge text into meaningful lines/paragraphs.
-#     # Use larger kernel on X axis to merge characters into single line, cancelling out any spaces.
-#     # But use smaller kernel on Y axis to separate between different blocks of text
-#     kernel = cv.getStructuringElement(cv.MORPH_RECT, (30, 5))
-#     dilate = cv.dilate(thresh, kernel, iterations=5)
-#
-#     # Find all contours
-#     contours, hierarchy = cv.findContours(dilate, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
-#     contours = sorted(contours, key = cv.contourArea, reverse = True)
-#
-#     # Find largest contour and surround in min area box
-#     largestContour = contours[0]
-#     minAreaRect = cv.minAreaRect(largestContour)
-#
-#     # Determine the angle. Convert it to the value that was originally used to obtain skewed image
-#     angle = minAreaRect[-1]
-#     if angle < -45:
-#         angle = 90 + angle
-#     return -1.0 * angle
-#
-#
-# # Rotate the image around its center
-# def rotateImage(cvImage, angle: float):
-#     newImage = cvImage.copy()
-#     (h, w) = newImage.shape[:2]
-#     center = (w // 2, h // 2)
-#     M = cv.getRotationMatrix2D(center, angle, 1.0)
-#     newImage = cv.warpAffine(newImage, M, (w, h), flags=cv.INTER_CUBIC, borderMode=cv.BORDER_REPLICATE)
-#     return newImage
-#
-#
-# # Deskew image
-# def deskew(cvImage):
-#     angle = getSkewAngle(cvImage)
-#     return rotateImage(cvImage, -1.0 * angle)
-#
-#
-# # rotated_img = deskew(skewed_img)
-# # cv.imwrite("temp/rotated_img.jpg", rotated_img)
-# # cv.imshow("Rotated Image", rotated_img)
-# # cv.waitKey(0)
-#
+# handling rotation and skewed documents
+# the code below will not be effective if image has borders, borders have to be removed first
+skewed_img = cv.imread("skewed1.jpg")
+
+
+def getSkewAngle(cvImage) -> float:
+    # Prep image, copy, convert to gray scale, blur, and threshold
+    newImage = cvImage.copy()
+    gray = cv.cvtColor(newImage, cv.COLOR_BGR2GRAY)
+    blur = cv.GaussianBlur(gray, (9, 9), 0)
+    thresh = cv.threshold(blur, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)[1]
+
+    # Apply dilate to merge text into meaningful lines/paragraphs.
+    # Use larger kernel on X axis to merge characters into single line, cancelling out any spaces.
+    # But use smaller kernel on Y axis to separate between different blocks of text
+    kernel = cv.getStructuringElement(cv.MORPH_RECT, (30, 5))
+    dilate = cv.dilate(thresh, kernel, iterations=5)
+
+    # Find all contours
+    contours, hierarchy = cv.findContours(dilate, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key = cv.contourArea, reverse = True)
+
+    # Find largest contour and surround in min area box
+    largestContour = contours[0]
+    minAreaRect = cv.minAreaRect(largestContour)
+
+    # Determine the angle. Convert it to the value that was originally used to obtain skewed image
+    angle = minAreaRect[-1]
+    if angle < -45:
+        angle = 90 + angle
+    return -1.0 * angle
+
+
+# Rotate the image around its center
+def rotateImage(cvImage, angle: float):
+    newImage = cvImage.copy()
+    (h, w) = newImage.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv.getRotationMatrix2D(center, angle, 1.0)
+    newImage = cv.warpAffine(newImage, M, (w, h), flags=cv.INTER_CUBIC, borderMode=cv.BORDER_REPLICATE)
+    return newImage
+
+
+# Deskew image
+def deskew(cvImage):
+    angle = getSkewAngle(cvImage)
+    return rotateImage(cvImage, -1.0 * angle)
+
+
+rotated_img = deskew(img)
+cv.imwrite("temp/rotated_img.jpg", rotated_img)
+cv.imshow("Rotated Image", rotated_img)
+cv.waitKey(0)
+
 # starting img to text process
 # img_1 = cv.imread(".jpeg")
 
